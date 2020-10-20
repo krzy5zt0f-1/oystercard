@@ -2,7 +2,6 @@ require 'oystercard'
 describe Oystercard do
   it { is_expected.to respond_to(:balance) }
   it { is_expected.to respond_to(:top_up) }
-  it { is_expected.to respond_to(:deduct) }
   it { is_expected.to respond_to(:in_journey) }
   it { is_expected.to respond_to(:touch_in) }
   it { is_expected.to respond_to(:touch_out) }
@@ -24,12 +23,6 @@ describe Oystercard do
       expect { subject.top_up(91) }.to raise_error("Can't exceed limit of £90")
     end
   end
-  describe "#deduct()" do
-    it "deduce amount from balance for a trip" do
-      subject.top_up(15)
-      expect{subject.deduct(20)}.to change{subject.balance}.by (-20)
-    end
-  end
   describe '.touch_in' do
     it 'changes in_journey to be true' do
       subject.top_up(5)
@@ -44,6 +37,10 @@ describe Oystercard do
       subject.top_up(5)
       subject.touch_in
       expect(subject.touch_out).to eq false
+    end
+    it "charges minimal fare charge once touched out" do
+      subject.top_up(40)
+      expect{subject.touch_out}.to change{subject.balance}.by (-2.5)
     end
   end
 

@@ -1,6 +1,6 @@
 class Oystercard
   attr_reader :balance, :in_journey
-
+  @@default_min_fare_charge = 2.50
   def initialize(balance = 0)
     @balance = balance
     @in_journey = false
@@ -13,17 +13,20 @@ class Oystercard
     @balance += amount
   end
 
-  def deduct(amount)
-    @balance -= amount
-  end
-
   def touch_in
     fail "Not enough credit, TOP UP!" if @balance < @default_min_cap
     @in_journey = true
   end
 
   def touch_out
+    @balance -= @@default_min_fare_charge
     @in_journey = false
+  end
+
+  private
+
+  def deduct(amount)
+    @balance -= amount
   end
 
 end
