@@ -1,12 +1,24 @@
 require 'oystercard'
 describe Oystercard do
   let(:station) { double :station }
+  let(:station1) { double :station1 }
   it { is_expected.to respond_to(:balance) }
   it { is_expected.to respond_to(:top_up) }
   it { is_expected.to respond_to(:in_journey) }
   it { is_expected.to respond_to(:touch_in) }
   it { is_expected.to respond_to(:touch_out) }
-
+  it { is_expected.to respond_to(:journeys) }
+  describe ".journeys" do
+    it "has an empty array by default" do
+      expect(subject.journeys).to eq []
+    end
+    it "stores travelled journeys" do
+      subject.top_up(5)
+      subject.touch_in(station)
+      subject.touch_out(station1)
+      expect(subject.journeys).to eq [{:entry=>station, :exit=>station1}]
+    end
+  end
   describe '.balance' do
     it 'returns the balance of the card' do
       expect(subject.balance).to eq 0
@@ -43,17 +55,20 @@ describe Oystercard do
       allow(station).to receive(:length).and_return(1)
       subject.top_up(5)
       subject.touch_in(station)
-      expect(subject.touch_out).to eq false
+      expect(subject.touch_out(station1)).to eq false
     end
     it 'changes entry_station to be nil' do
       allow(station).to receive(:length).and_return(1)
       subject.top_up(5)
       subject.touch_in(station)
-      expect{subject.touch_out}.to change{subject.entry_station}.to (nil)
+      expect{subject.touch_out(station1)}.to change{subject.entry_station}.to (nil)
     end
     it "charges minimal fare charge once touched out" do
       subject.top_up(40)
-      expect{subject.touch_out}.to change{subject.balance}.by (-2.5)
+      expect{subject.touch_out(station1)}.to change{subject.balance}.by (-2.5)
+    end
+    it "throws an error if no station provided" do
+      expect { subject.touch_out }.to raise_error(ArgumentError)
     end
   end
 
