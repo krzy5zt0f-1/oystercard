@@ -1,27 +1,13 @@
 require 'oystercard'
 describe Oystercard do
-  let(:station) { double :station }
-  let(:station1) { double :station1 }
+  let(:journey) {double :journey}
+  let(:station) {double :station}
+  let(:station1) {double :station1}
+  let(:journey_class_double) {double :journey_class, new: journey}
   it { is_expected.to respond_to(:balance) }
   it { is_expected.to respond_to(:top_up) }
   it { is_expected.to respond_to(:touch_in) }
   it { is_expected.to respond_to(:touch_out) }
-  it { is_expected.to respond_to(:journeys) }
-  describe ".journeys" do
-    it "has an empty array by default" do
-      expect(subject.journeys).to eq []
-    end
-    it "stores travelled journeys" do
-      allow(station).to receive(:name).and_return("station")
-      allow(station).to receive(:zone).and_return(1)
-      allow(station1).to receive(:name).and_return("station1")
-      allow(station1).to receive(:zone).and_return(3)
-      subject.top_up(5)
-      subject.touch_in(station)
-      subject.touch_out(station1)
-      expect(subject.journeys).to eq [[{:name=>"station", :zone=>1}, {:name=>"station1", :zone=>3}]]
-    end
-  end
   describe '.balance' do
     it 'returns the balance of the card' do
       expect(subject.balance).to eq 0
@@ -69,7 +55,7 @@ describe Oystercard do
       subject.touch_in(station)
       expect{subject.touch_out(station1)}.to change{subject.balance}.by (-7.5)
     end
-    it "it charges penalty if no  entry given" do
+    it "it charges penalty if no entry given" do
       subject.top_up(40)
       allow(station1).to receive(:name).and_return("station1")
       allow(station1).to receive(:zone).and_return(3)

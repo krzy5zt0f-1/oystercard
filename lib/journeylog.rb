@@ -1,7 +1,6 @@
 require_relative  '../lib/journey'
 
 class JourneyLog
-
   def initialize(journey_class:)
     @journey_class = journey_class
     @journeys = []
@@ -13,16 +12,16 @@ class JourneyLog
   end
 
   def finish(station_instance)
+    current_journey
     @current_journey.end(station_instance)
-    @current_journey = nil 
+    @journeys << @current_journey
+    @current_journey = nil
   end
 
   def journeys
     @journeys.dup
   end
-
-  private
-
+private
   def current_journey
     @current_journey ||= @journey_class.new
   end

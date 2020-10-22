@@ -31,10 +31,21 @@ describe JourneyLog do
       expect(journey).to receive(:end).with(station)
       subject.finish(station)
     end
+    it "adds finish station, provided the starting one was not given" do
+      expect(journey).to receive(:end).with(station)
+      subject.finish(station)
+    end
     it "updates the finish station in journeys" do
       allow(journey).to receive(:begin).and_return(station)
       allow(journey).to receive(:end).and_return(station1)
       subject.start(station)
+      subject.finish(station1)
+      expect(subject.journeys).to include journey
+    end
+    it "updates the finish station in journeys even if no entry was given" do
+      allow(journey).to receive(:begin).and_return(station)
+      allow(journey).to receive(:end).and_return(station1)
+      #subject.start(station)
       subject.finish(station1)
       expect(subject.journeys).to include journey
     end
