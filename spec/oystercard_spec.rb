@@ -4,7 +4,6 @@ describe Oystercard do
   let(:station1) { double :station1 }
   it { is_expected.to respond_to(:balance) }
   it { is_expected.to respond_to(:top_up) }
-  it { is_expected.to respond_to(:in_journey) }
   it { is_expected.to respond_to(:touch_in) }
   it { is_expected.to respond_to(:touch_out) }
   it { is_expected.to respond_to(:journeys) }
@@ -13,10 +12,14 @@ describe Oystercard do
       expect(subject.journeys).to eq []
     end
     it "stores travelled journeys" do
+      allow(station).to receive(:name).and_return("station")
+      allow(station).to receive(:zone).and_return(1)
+      allow(station1).to receive(:name).and_return("station1")
+      allow(station1).to receive(:zone).and_return(3)
       subject.top_up(5)
       subject.touch_in(station)
       subject.touch_out(station1)
-      expect(subject.journeys).to eq [{:entry=>station, :exit=>station1}]
+      expect(subject.journeys).to eq [[{:name=>"station", :zone=>1}, {:name=>"station1", :zone=>3}]]
     end
   end
   describe '.balance' do
@@ -37,12 +40,6 @@ describe Oystercard do
     end
   end
   describe '.touch_in' do
-    it 'changes in_journey to be true' do
-      allow(station).to receive(:length).and_return(1)
-      subject.top_up(5)
-      expect(subject.touch_in(station)).to eq true
-      expect(subject.entry_station).to eq station
-    end
     it "throws an error if balance has insufficent funds" do
       expect { subject.touch_in(station) }.to raise_error "Not enough credit, TOP UP!"
     end
@@ -51,25 +48,26 @@ describe Oystercard do
     end
   end
   describe '.touch_out' do
-    it 'changes in_journey to be false' do
-      allow(station).to receive(:length).and_return(1)
-      subject.top_up(5)
-      subject.touch_in(station)
-      expect(subject.touch_out(station1)).to eq false
-    end
-    it 'changes entry_station to be nil' do
-      allow(station).to receive(:length).and_return(1)
-      subject.top_up(5)
-      subject.touch_in(station)
-      expect{subject.touch_out(station1)}.to change{subject.entry_station}.to (nil)
-    end
-    it "charges minimal fare charge once touched out" do
+    it "charges minimal fare charge for travel in same zone" do
       subject.top_up(40)
+      allow(station).to receive(:name).and_return("station")
+      allow(station).to receive(:zone).and_return(1)
+      allow(station1).to receive(:name).and_return("station1")
+      allow(station1).to receive(:zone).and_return(1)
+      subject.touch_in(station)
       expect{subject.touch_out(station1)}.to change{subject.balance}.by (-2.5)
     end
     it "throws an error if no station provided" do
       expect { subject.touch_out }.to raise_error(ArgumentError)
     end
+    it "charges specific fare charge for travel across zones" do
+      subject.top_up(40)
+      allow(station).to receive(:name).and_return("station")
+      allow(station).to receive(:zone).and_return(1)
+      allow(station1).to receive(:name).and_return("station1")
+      allow(station1).to receive(:zone).and_return(3)
+      subject.touch_in(station)
+      expect{subject.touch_out(station1)}.to change{subject.balance}.by (-7.5)
+    end
   end
-
 end

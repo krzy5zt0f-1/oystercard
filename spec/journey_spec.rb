@@ -3,7 +3,6 @@ require_relative '../lib/journey'
 describe Journey do
   let(:station) { double :station }
   let(:station1) { double :station1 }
-  it { is_expected.to respond_to(:in_journey) }
   it { is_expected.to respond_to(:start) }
   it { is_expected.to respond_to(:end) }
   it { is_expected.to respond_to(:entry_station) }

@@ -5,21 +5,18 @@ require_relative 'station'
 class Journey
   @@PENALTY_FARE = 6
   @@default_min_fare_charge = 2.50
-  attr_reader :in_journey, :entry_station, :end_station
+  attr_reader :entry_station, :end_station
 
   def initialize
-    @in_journey = false
     @entry_station; @end_station
   end
 
   def start(station_instance)
     @entry_station = {name: station_instance.name, zone: station_instance.zone}
-    @in_journey = true
   end
 
   def end(station_instance)
     @end_station = {name: station_instance.name, zone: station_instance.zone}
-    @in_journey = false;
   end
 
   def fare
