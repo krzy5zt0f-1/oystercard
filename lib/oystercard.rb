@@ -23,6 +23,7 @@ class Oystercard
   end
 
   def touch_out(station_instance)
+    @current_journey = Journey.new if @current_journey == nil
     @current_journey.end(station_instance)
     @journeys << [@current_journey.entry_station, @current_journey.end_station]
     @balance -= @current_journey.fare

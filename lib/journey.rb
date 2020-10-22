@@ -11,7 +11,7 @@ class Journey
     @entry_station; @end_station
   end
 
-  def start(station_instance)
+  def begin(station_instance)
     @entry_station = {name: station_instance.name, zone: station_instance.zone}
   end
 

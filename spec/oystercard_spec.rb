@@ -69,5 +69,11 @@ describe Oystercard do
       subject.touch_in(station)
       expect{subject.touch_out(station1)}.to change{subject.balance}.by (-7.5)
     end
+    it "it charges penalty if no  entry given" do
+      subject.top_up(40)
+      allow(station1).to receive(:name).and_return("station1")
+      allow(station1).to receive(:zone).and_return(3)
+      expect{subject.touch_out(station1)}.to change{subject.balance}.by (-6)
+    end
   end
 end
